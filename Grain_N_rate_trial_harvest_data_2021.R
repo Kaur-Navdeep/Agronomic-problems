@@ -3,7 +3,7 @@ install.packages("tidyverse")
 ### Week 4 and 5 ###
 rm(list = ls())
 library(tidyverse)
-setwd("~/Desktop/Agronomic-problems")
+setwd("~/Desktop/Agronomic-problems/Agronomic-problems")
 ### For harvest data analysis ##
 data = read_csv("Grain_N_rate_trial_harvest_data_2021.csv") ## opening file 
 data$N_rates_Kg_per_ha = as.numeric(data$N_rates_Kg_per_ha) ## converting N rates into numeric values for calculation 
@@ -27,8 +27,8 @@ hist(data$Seed_yield_kg_per_ha)
 ## grouping data according to N rates and then get average yield in all N rates using summarise command 
 averyield = group_by(data, N_rates_Kg_per_ha ); averyield
 TotalDataSummarybyYield = summarise(averyield, average_yield = mean(Seed_yield_kg_per_ha, na.rm = TRUE)); TotalDataSummarybyYield
-data$Dry_biomass_yield_kg_per_ha[data$Milk>19.9] = NA   
-outier = which.max(data$Seed_yield_kg_per_ha, data$N_rates_Kg_per_ha == "168")
+
+
 # grouping yield data of Bialobrezeskie and average yield as per N rates 
 Bialobrzeskiegroup = group_by(A, N_rates_Kg_per_ha ); Bialobrzeskiegroup
 Bialobrzeskieaverageyield = summarise(Bialobrzeskiegroup, average_yield = mean(Seed_yield_kg_per_ha, na.rm = TRUE))
