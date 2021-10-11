@@ -1,4 +1,4 @@
-Plot_no.,Variety,N_rates_Kg_per_ha,Rep,No_of_plants ,Plant_height,Dry_biomass_yield,Aboveground_residue_wt,Root_dry_wt,Seed_yield ,Seed_yield_per_plant,TS_1,TKN_1,TP_1,TK_1,TS_2,TK_2,TP_2,TKN_2
+Plot_no.,Variety,N_rates,Block,No_of_plants ,Plant_height,Dry_biomass_yield,Aboveground_residue_wt,Root_dry_wt,Seed_yield ,Seed_yield_per_plant,TS_1,TKN_1,TP_1,TK_1,TS_2,TK_2,TP_2,TKN_2
 101,Bialobrzeskie,56,1,23,91.44,437.64,350.11,109.2896175,87.53,3.80565217,2.689482888,35.25634766,4.330751936,27.8478,2.179775281,19.76379526,0.035256348,18.85813
 102,X-59,224,1,12,40.89,678.34,503.29,54.64480874,175.05,13.82,2.082898982,30.89356436,3.8634897,29.84152,1.734265734,27.08241758,0.030893564,18.74383
 103,Bialobrzeskie,168,1,19,216.41,1378.56,1115.98,174.863388,262.58,34.874375,1.950611125,33.20512821,4.330755799,27.21382,1.530352236,23.56532601,0.033205128,19.04083
