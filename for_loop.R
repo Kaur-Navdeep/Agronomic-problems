@@ -21,8 +21,8 @@ library(agricolae)
 sink("Anova_Results.doc")
 for(i in 5:ncol(data1)){
   column = names(data1[i])
-  model1 = lm((data1[,i]~ data1$N_rates*Variety + Block), data = data1)
-  anova = anova(lm((data1[,i]~ data1$N_rates*Variety + Block), data = data1))
+  model1 = lm((data1[,i]~ data1$N_rates* Variety + Block), data = data1)
+  anova = anova(model1)
   Shapiro = shapiro.test(model1$resid)
   print(column)
   print(anova)
@@ -30,9 +30,35 @@ for(i in 5:ncol(data1)){
   print(HSD)
 }
 sink()
+summary = list()
+  ## model using aov   
+for(i in 5:ncol(data1)){
+       column = names(data1[i])
+       anova = aov((data1[,i]~ data1$N_rates* Variety + Block), data = data1)
+       summary = summary(anova)
+       Shapiro = shapiro.test(anova$resid)
+       HSD = HSD.test (anova, trt = c("N_rates", "Variety"), group = TRUE, console=TRUE)
+       print(column)
+       print(anova)
+       print(Shapiro)
+       print(HSD)
+}
+anova = list()
+## 
+for(i in 5:ncol(data1)){
+  column = names(data1[i])
+  anova= aov(data1[,i]~ data1[,i]$N_rates + data1[,i]Variety + data1[,i]Block)
+  Shapiro = shapiro.test(model1$resid)
+  HSD = HSD.test (model1, trt = c("N_rates", "Variety"), group = TRUE, console=TRUE)
+  print(column)
+  print(anova)
+  print(Shapiro)
+  print(HSD)
+}
+## Extra
 data$
   HSD = HSD.test (model1, trt = c("N_rates"), group = TRUE, console=TRUE)
- 
+
 df = df.residual(model1)
 MSerror = deviance(model1)/df
-with(data1,HSD.test (data1[i], N_rates, df, MSerror, group = TRUE, console=TRUE)
+with(data1,HSD.test (data1[i], N_rates, df, MSerror, group = TRUE, console=TRUE)    
