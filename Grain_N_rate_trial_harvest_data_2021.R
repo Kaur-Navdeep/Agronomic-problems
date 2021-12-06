@@ -5,83 +5,72 @@ rm(list = ls())
 library(tidyverse)
 library(agricolae)
 library(ggplot2)
+library(ggpubr)
 
 setwd("~/Desktop/Agronomic-problems/Agronomic-problems")
 ### For harvest data analysis ##
-data <- read_csv("Grain_N_rate_trial_harvest_data_2021.csv") ## opening file 
+harvest <- read.csv("Grain_N_rate_trial_harvest_data_2021.csv") ## opening file 
  ## converting N rates into numeric values for calculation 
 
-# converting replications and varieties as factors ####
-data$block <-  as.factor(data$block)
-data$trt_num <- as.numeric(data$trt)
-data$variety <-  as.factor(data$variety)
-str(data$variety)
-data$trt_fac <- as.factor(data$trt)
-data$plot_no.<- as.factor(data$plot_no.)
-class(data$trt)
+# converting variables into factors factors ####
+harvest$block <-  as.factor(harvest$block)
+harvest$variety <-  as.factor(harvest$variety)
+str(harvest$variety)
+harvest$trt_fac <- as.factor(harvest$trt)
+harvest$plot_no.<- as.factor(harvest$plot_no.)
 
-str(data) 
-
-data%>%select(variety,trt,block, plant_ht, dry_biomass_yield, seed_yield) ## to select specific columns
 
 # filtering data according to two varieties ####
-bia <-  filter(data, data$variety == "Bialobrzeskie")
-x59 <-  filter(data, data$variety == "X-59")
+bia <-  filter(harvest, harvest$variety == "Bialobrzeskie")
+x59 <-  filter(harvest, harvest$variety == "X-59")
 
-
-# data visualization based on varieties separately ####
+# grain yield visualization based on varieties separately ####
       
-boxplot(bia$seed_yield ~ bia$trt)
-hist(bia$seed_yield)
+boxplot(bia$grain_yield ~ bia$trt_fac)   ## high variability in data 
+hist(bia$grain_yield)      ## histogram does not look normal due to few data points
 
 
-boxplot(x59$seed_yield ~ x59$trt)
-hist(x59$seed_yield)
+boxplot(x59$grain_yield ~ x59$trt)
+hist(x59$grain_yield)    ## histogram of X-59 does not look normally distibuted
 
-boxplot(data$seed_yield ~ data$trt)
-hist(data$seed_yield)
+## for loop to check normal distribution of data ####
 
-bia_anova <- aov(seed_yield ~ trt + block, data = bia)
-summary(bia_anova)
-shapiro.test(bia_anova$resid)
+mydata <- harvest%>%select(-16,)
+str(mydata) 
+table(mydata$trt)
+1:ncol(mydata)
+boxplot <- list()
+histogram <- list()
+plot <- list()
 
+for (i in 6:ncol (mydata)){
+  column <- names(mydata[i])
+  boxplot <- boxplot(mydata[,i] ~ mydata$trt, ylab = column, main = column) 
+  histogram <- hist(mydata[,i], ylab = column, main = column) 
+}
 
-hsd_bia <- HSD.test (bia_anova, "trt")
-hsd_bia
-
-
-
-x59_anova <- aov(seed_yield ~ trt + block, data = x59)
-summary(x59_anova)
-shapiro.test(x59_anova$resid)
-
-
-HSDdata <- HSD.test (x59_anova, "trt")
-HSDdata
-
-
+## based on graphical visualization, grain yield, plant height and grain yield per plant does not seem to be normally distributed. 
 
 # grouping data according to N rates and then get average yield in all N rates using summarise command ####
-averyield <-  group_by(data, trt); averyield
-summary_yield <-  summarise(averyield, average_yield = mean(seed_yield, na.rm = TRUE));summary_yield
+averyield <-  group_by(harvest, trt); averyield
+summary_yield <-  summarise(averyield, average_yield = mean(grain_yield), average_grain_yield_per_plant = mean(grain_yield_per_plant), na.rm = TRUE);summary_yield
 
 
 ## grouping yield data of Bialobrezeskie and average yield as per N rates ####
 biagroup <-  group_by(bia, trt); biagroup
-bia_yield <-  summarise(biagroup, average_yield = mean(seed_yield, na.rm = TRUE)); bia_yield
+bia_yield <-  summarise(biagroup, average_yield = mean(grain_yield, na.rm = TRUE)); bia_yield
 
-class(biagroup$trt)
 
 
 ## grouping yield data of X-59 and average yield as per N rates ####
 x59group <-  group_by(x59, trt); x59group
-x59_yield <-  summarise(x59group, average_yield = mean(seed_yield, na.rm = TRUE)); x59_yield
+x59_yield <-  summarise(x59group, average_yield = mean(grain_yield, na.rm = TRUE)); x59_yield
 
 options(scipen = 999)
 
 ## MRTN Bialobrezeskie using averged data, taking N price as $2.83/Kg and Hemp seed price as $550/Kg ##
 mrtn_bia <- mutate(bia_yield,
-                   fertilizer_price = trt * 2.83, mrtn = ((average_yield- 53.3375)*550) - (trt*2.83))
+                   fertilizer_price = trt * 2.83, mrtn = ((average_yield- 53.3375)*550) - (fertilizer_price))
 mrtn_bia
 ## MRTN X-59 using averaged data, taking N price as $2.83/Kg and Hemp seed price as $550/Kg
 
@@ -89,316 +78,299 @@ mrtn_x59 <- mutate(x59_yield,
                    fertilizer_price = x59_yield$trt*2.83, mrtn = ((x59_yield$average_yield- 39.6600)*550) - (x59_yield$trt*2.83))
 mrtn_x59
 
-grouped_data <-  group_by(data, trt, variety)
+grouped_data <-  group_by(harvest, trt)
 ## average data ####
-average <-  summarise(grouped_data,  no_of_plants_average = mean(no_of_plants), dry_biomass_yield_average = mean(dry_biomass_yield), aboveground_residue_wt_average = mean(aboveground_residue_wt), plant_ht = mean(plant_ht), seed_yield_average = mean(seed_yield), na.rm = TRUE)
+average <-  summarise(grouped_data,  no_of_plants_average = mean(no_of_plants), biomass_yield_average = mean(biomass_yield), aboveground_residue_wt_average = mean(aboveground_residue_wt), plant_ht = mean(plant_ht), seed_yield_average = mean(grain_yield), na.rm = TRUE)
 average 
 ## Standard deviation ####
-sd <-  summarise(grouped_data,  no_of_plants_sd = sd(no_of_plants), dry_biomass_yield_sd = sd(dry_biomass_yield), aboveground_plant_residue_weight_sd = sd(aboveground_residue_wt), plant_ht_sd = sd(plant_ht),seed_yield_sd = sd(seed_yield), na.rm = TRUE)
+sd <-  summarise(grouped_data,  no_of_plants_sd = sd(no_of_plants), biomass_yield_sd = sd(biomass_yield), aboveground_plant_residue_weight_sd = sd(aboveground_residue_wt), plant_ht_sd = sd(plant_ht),grain_yield_sd = sd(grain_yield), na.rm = TRUE)
 sd
 
-# data visualization week 6 and 7 ####
+# data visualization using ggplot week 6 and 7 ####
 
-ggplot(data = data, aes(x = trt_num, y = seed_yield, color = variety))+ 
+ggplot(data = harvest, aes(x = trt, y = grain_yield, color = variety))+ 
   geom_point() +
   geom_smooth(formula=(y~x + x^2), position = "identity", stat = "smooth", se=FALSE, method = "loess") +
-  theme_linedraw() + labs (x = "N rates (kg/ha)", y = "Seed yield (kg/ha)")+
+  theme_linedraw() + labs (x = "N rates (kg/ha)", y = "Grain yield (kg/ha)")+
   scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))## loess is locally weighted least squares regression, it uses more local data to estimate our Y variable
 
-ggplot(data, aes(x = trt_fac, y = seed_yield, color = variety) ) + 
-  geom_violin() + labs (x = "N rates (kg/ha)", y = "Seed yield (kg/ha)") + theme_linedraw()
+ggplot(harvest, aes(x = trt_fac, y = plant_ht, color = variety) ) + 
+  geom_violin() + labs (x = "N rates (kg/ha)", y = "Plant height (cm)") + theme_linedraw()
 
-ggplot(data = data )+ 
-  geom_point(mapping = aes(x = trt_fac, y = seed_yield, shape = variety))+
-  labs (x = "N rates (kg/ha)", y = "Seed yield (kg/ha)") + theme_linedraw()
+ggplot(data = harvest)+ 
+  geom_point(mapping = aes(x = trt_fac, y = grain_yield_per_plant, shape = variety))+
+  labs (x = "N rates (kg/ha)", y = "Seed yield per plant (grams)") + theme_linedraw()
 
-ggplot(data = data )+ 
-  geom_point(mapping = aes(x = trt_fac, y = seed_yield)) +
+ggplot(data = harvest)+ 
+  geom_point(mapping = aes(x = trt_fac, y = N)) +
   facet_wrap(~variety, nrow=2, ncol = 2)+ 
-  labs (x = "N rates (kg/ha)", y = "Seed yield (kg/ha)") + theme_linedraw()
+  labs (x = "N rates (kg/ha)", y = "Percent N in leaves") + theme_linedraw()
 
-ggplot(data = data )+   
-  geom_point(mapping = aes(x = trt_fac, y = dry_biomass_yield))+
+ggplot(data = harvest )+   
+  geom_point(mapping = aes(x = trt_fac, y = biomass_yield))+
   facet_wrap(~variety, nrow=1, ncol = 2)+
   labs (x = "N rates (kg/ha)", y = "Dry biomass yield (kg/ha)") + theme_linedraw()
   
-ggplot(data=data)+
-  geom_histogram(mapping = aes( x = seed_yield), binwidth = 28)
 
-
-
-ggplot (data = data) +
+ggplot (data = harvest) +
   stat_summary(
-    mapping = aes (x= data$trt_num, y= data$dry_biomass_yield, color = variety),
+    mapping = aes (x = trt_fac, y = root_wt, color = variety),
     fun.max = max,
     fun.min = min,
     fun = median
   ) +
-  facet_wrap(~variety, nrow=1)+  labs (x = "N rates (kg/ha)", y = "Seed yield (kg/ha)") + theme_linedraw() +
-  scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))
+  facet_wrap(~variety, nrow=1)+  labs (x = "N rates (kg/ha)", y = "Roots dry weight (kg/ha)") + theme_linedraw() 
 
-ggplot (data = data) +
+
+ggplot (data = harvest) +
   stat_summary(
-    mapping = aes (x= data$trt, y= data$dry_biomass_yield, color = variety),
+    mapping = aes (x= trt, y = S, color = variety),
     fun.max = max,
     fun.min = min,
     fun = median
   )  +
-  facet_wrap(~variety, nrow=1)+  labs (x = "N rates (kg/ha)", y = "Dry biomass yield (kg/ha)") + theme_linedraw() +
+  facet_wrap(~variety, nrow=1)+  labs (x = "Percent sulphur in leaves", y = "Dry biomass yield (kg/ha)") + theme_linedraw() +
   scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))
 
 
-ggplot(data = data)+ 
-  geom_boxplot(mapping = aes(x = data$trt_fac, y = data$seed_yield), stat = "boxplot")+
+ggplot(data = harvest)+ 
+  geom_boxplot(mapping = aes(x = trt_fac, y = K), stat = "boxplot")+
   facet_wrap(~variety, nrow=1)+
-  theme_bw() + labs (x = "N rates (kg/ha)", y = "Dry biomass yield (kg/ha)")
+  theme_bw() + labs (x = "N rates (kg/ha)", y = "Percent K in leaves")
 
 
 ## week 8 statistics
 
-##  seed yield analysis
-fit <-  lm(seed_yield ~ trt, data = data)
-fit
-summary(fit)
+##  regression analysis of seed yield ####
+seedyield <- harvest%>%select(grain_yield, biomass_yield, plant_ht, root_wt, no_of_plants, trt)
 
+pairs(seedyield)
 
-# anova seed yield without transformation (here data does not follow assumptions of ANOVA #####################
+y <- harvest$grain_yield
+x1 <- harvest$biomass_yield
+x2 <- harvest$plant_ht
+x3 <- harvest$root_wt
+x4 <- harvest$no_of_plants
+x5 <- harvest$trt
 
-anova_sy <-  aov (seed_yield ~ trt_fac*variety + block, data = data)
-summary(anova_sy)
-shapiro.test(anova_sy$resid)
-hsdseed<- HSD.test (anova_sy, "trt_fac")
-hsdseed
+fit1 <- lm(y ~ x1)
+fit2 <- lm(y ~ x1 + x2)
+fit3 <- lm(y ~ x1 + x2 + x3)
+fit4 <- lm(y ~ x1 + x2 + x3 + x4 + x5)
 
+summary(fit1)
+summary(fit2)
+summary (fit3)
+summary(fit4)
 
-Gseeds = as.data.frame(hsdseed$means); Gseeds
-Gseeds$trt_fac <- c("0","112","168", "224", "280", "56")
-Gseeds
-str(Gseeds)
+## best adjusted R2 is for fit 3 and fit 4
 
-Gseeds$trt_fac<-factor(Gseeds$trt_fac,levels = c("0","56","112","168","224","280"))
-str(Gseeds)
-library(ggplot2)
+anova(fit3, fit4) 
 
-e <- ggplot(Gseeds, aes(x = trt_fac, y = seed_yield, fill=trt_fac))+
-  geom_bar(stat="identity",position=position_dodge(), color="black",  ## stat equal to identity means avde jehra yield ala result a ohi number use krna na k jive hunda bar graph ch count use krn ala)
-           width = 0.7)+
-  labs(y = " Grain yield (kg/ha)", x = "N rates (kg/ha)") + 
-  scale_fill_viridis_d(option = "D", direction = -1)+
-  geom_errorbar(aes(ymin = seed_yield - ((std)/sqrt(r)), ymax = seed_yield + ((std)/sqrt(r))), width =.2,
-                position = position_dodge(0.9))+
-  theme_light() + ylim(c(0, 400)) +
-  geom_text(data=Gseeds,
-            aes( x = trt_fac, y = seed_yield + ((std)/sqrt(r)) + 10, label=c("b","ab","a","ab","ab", "ab")),vjust=0)+
-  theme(legend.position = "none")+
-  theme(axis.text=element_text(size=9,face="bold" ),
-        axis.title=element_text(size=9,face="bold"))
-e
+## there is no significant difference between these two models, there we can consider reduced model i.e. fit3
 
+anova (fit2, fit4)
 
+## there is no significant difference between these two models, there we can consider reduced model i.e. fit2
 
-ggsave("Grain_yield.png", e, dpi=600, width = 8, height = 8, units = "cm" )
+anova (fit1, fit2)
+
+## there is difference between models, model fit2 is best and explains 
+
+backAIC <- step(fit4, direction = "backward")
+
+## based on backward selection model, fit 2 is best
 
 
 
+# ANOVA analysis ####
+# anova grain yield without transformation (here data does not follow assumptions of ANOVA #####################
 
+anova_gy <-  aov (grain_yield ~ trt_fac*variety + block, data = harvest)
+summary(anova_gy)
+shapiro.test(anova_gy$resid)
+plot(anova_gy)
 
 
 # seed yield ####
-## log transformation of seed yield ####
+## log transformation of grain yield ####
 
-data$seed_yield_log = log(data$seed_yield)
-str(data$seed_yield_log)
-   
-## regression of log transformed seed yield ####   
-
-fit2 <- lm(seed_yield_log ~ trt, data = data)
-fit2
-summary(fit2)
-## anova of log transformed seed yield #####
-
-anova_sy_log <-  aov (seed_yield_log ~ trt_fac*variety + block, data = data)
-summary(anova_sy_log)
-shapiro.test(anova_sy_log$resid)
-hsdseedyield<- HSD.test (anova_sy_log, "trt_fac")
-hsdseedyield
+harvest$grain_yield_log = log(harvest$grain_yield)
+str(harvest$grain_yield_log)
 
 
-log_seed_yield = as.data.frame(hsdseedyield$means); log_seed_yield
-log_seed_yield$trt_fac <- c("0","112","168", "224", "280", "56")
-log_seed_yield
+## anova of log transformed grain yield #####
 
-log_seed_yield$trt_fac <- factor(log_seed_yield$trt_fac, levels = c("0","56","112","168","224","280"))
-str(log_seed_yield)
-library(ggplot2)
+anova_gy_log <-  aov (grain_yield_log ~ trt_fac*variety + block, data = harvest)
+summary(anova_gy_log)
+shapiro.test(anova_gy_log$resid)
 
-l <- ggplot(log_seed_yield, aes(x = trt_fac, y = seed_yield_log, fill= trt_fac))+
-  geom_bar(stat="identity",position=position_dodge(), color="black",  ## stat equal to identity means avde jehra yield ala result a ohi number use krna na k jive hunda bar graph ch count use krn ala)
-           width = 0.7)+
-  labs(y = " log (Grain yield (kg/ha))", x = "N rates (kg/ha)") + 
-  scale_fill_viridis_d(option = "D", direction = -1)+
-  geom_errorbar(aes(ymin = seed_yield_log - ((std)/sqrt(r)), ymax = seed_yield_log + ((std)/sqrt(r))), width =.2,
-                position = position_dodge(0.9))+
-  theme_light() + ylim(c(0, 6.5)) +
-  geom_text(data=log_seed_yield,
-            aes( x = trt_fac, y = seed_yield_log + ((std)/sqrt(r)) + 0.2, label=c("b","a","a","a","a", "a")),vjust=0)+
-  theme(legend.position = "none")+
-  theme(axis.text=element_text(size=9,face="bold" ),
-        axis.title=element_text(size=9,face="bold"))
-l
+plot(anova_gy_log)  ## plots look good with some outliers, which could be removed by two year data
 
-ggsave("Log_Grain_yield.png", l, dpi=600, width = 8, height = 8, units = "cm" )
-## test for normality
+hsdgrainyield <- HSD.test (anova_gy_log, "trt_fac")
+hsdgrainyield
 
+mydata1 = harvest%>%select(trt_fac, variety, grain_yield) 
 
-# seed yield per plant ####
-## regression seed yield per plant ####
+A <-  mydata1 %>%
+  group_by( trt_fac) %>%
+  summarize(mean = mean(grain_yield), sd = sd(grain_yield), se = sd/sqrt(8))
 
-fit1 <-  lm(seed_yield_per_plant ~ trt_num, data = data)
-summary(fit1)
-## anova seed yield per plant ####
-anova_pp <-  aov (data$seed_yield_per_plant ~ trt_fac*variety + block, data = data);
-summary(anova_pp)
-shapiro.test(fit$resid)      ### data not follow assumptions of ANOVA
-
-## log transformation of seed yield per plant and ANOVA ####
-data$seed_yield_per_plant_log = log(data$seed_yield_per_plant)   ## log transformation of data 
-
-anova_pp <-  aov (data$seed_yield_per_plant_log ~ trt_fac*variety + block, data = data); 
-summary(anova_pp)
-shapiro.test(anova_pp$resid)
-
-#### results indicate there is interaction between seed yield per plant and variety 
-## HSD by subsetting data based on varieties because of interaction ####
-
-bia$seed_yield_per_plant_log = log(bia$seed_yield_per_plant)
-hsd_bia_pp= with(bia,HSD.test(seed_yield_per_plant_log, trt_fac, 33,0.6551,console=TRUE))
-
-x59$seed_yield_per_plant_log = log(x59$seed_yield_per_plant)
-hsd_x59_pp= with(x59,HSD.test(seed_yield_per_plant_log, trt_fac, 33,0.6551,console=TRUE))
-
-mydata = data%>%select(trt_fac, variety, seed_yield_per_plant_log) 
-
-D <-  mydata %>%
-  group_by( variety, trt_fac) %>%
-  summarize(mean = mean(seed_yield_per_plant_log), sd = sd(seed_yield_per_plant_log), se = sd/sqrt(4))
-
-a <-  ggplot(D, aes(fill = trt_fac, y = mean, x = variety)) + 
+a <-  ggplot(A, aes(y = mean, x = trt_fac, fill = trt_fac)) + 
   geom_bar(position = "dodge", stat = "identity") +
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), width=.2,
                 position = position_dodge(0.9))+
-theme_bw() + labs(y = "Log(Seed yield per plant (grams)", x = "Varieties")+
+  theme_bw() + labs(y = "Grain yield (kg/ha)", x = "N rates (kg/ha)")+
   scale_fill_viridis_d(option = "D", direction = -1, name = "Races")+
-  annotate("text",x=1.62,y=2.9,label="AB", size=3)+
-  annotate("text",x=1.78,y=3.55,label="A", size=3)+
-  annotate("text",x=1.92,y=3.1, label="AB", size=3)+
-  annotate("text",x=2.08,y=1.75,label="B", size=3)+
-  annotate("text",x=2.24,y=2.9,label="AB", size=3)+
-  annotate("text",x=2.39,y=2.8,label="AB", size=3)
+  annotate("text", x = 1, y = 65,label = "b", size = 4)+
+  annotate("text",x = 2, y = 190, label = "a", size = 4)+
+  annotate("text",x = 3, y = 255, label = "a", size = 4)+
+  annotate("text",x = 4, y = 320,label = "a", size = 4)+
+  annotate("text",x = 5, y = 310,label = "a", size = 4)+
+  annotate("text",x = 6, y = 305,label ="a", size = 4)+
+  theme(legend.position = "none") 
 a
+
+
+ggsave("Grain_yield.png", a, dpi=600, width = 8, height = 8, units = "cm" )
+## test for normality
+
+
+
+## anova seed yield per plant ####
+anova_pp <-  aov (grain_yield_per_plant ~ trt_fac*variety + block, data = harvest);
+summary(anova_pp)
+shapiro.test(anova_pp$resid)  
+
+plot(anova_pp)  # based on shapiro and graphs data does not follow assumptions of ANOVA
+
+### data not follow assumptions of ANOVA
+
+## log transformation of grain yield per plant and ANOVA ####
+harvest$grain_yield_per_plant_log = log(harvest$grain_yield_per_plant + 1)   ## log transformation of data 
+
+anova_pp_log <-  aov (grain_yield_per_plant_log ~ trt_fac*variety + block, data = harvest); 
+summary(anova_pp_log)
+shapiro.test(anova_pp_log$resid)
+plot(anova_pp_log)
+
+hsd_pp <- HSD.test(anova_pp_log, "trt_fac"); hsd_pp
+#### results indicate there is no interaction between grain yield per plant and variety thus results are presented with N rates
+
+
+mydata = harvest%>%select(trt_fac, variety, grain_yield_per_plant) 
+
+D <-  mydata %>%
+  group_by( trt_fac) %>%
+  summarize(mean = mean(grain_yield_per_plant), sd = sd(grain_yield_per_plant), se = sd/sqrt(4))
+
+b <-  ggplot(D, aes(y = mean, x = trt_fac, fill = trt_fac)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se), width=.2,
+                position = position_dodge(0.9))+
+theme_bw() + labs(y = "Grain yield per plant (grams)", x = "N rates (kg/ha)")+
+  scale_fill_viridis_d(option = "D", direction = -1, name = "Races")+
+  annotate("text", x = 1, y = 0.75,label = "b", size = 4)+
+  annotate("text",x = 2, y = 2.7, label = "a", size = 4)+
+  annotate("text",x = 3, y = 3.2, label = "a", size = 4)+
+  annotate("text",x = 4, y = 4.1,label = "a", size = 4)+
+  annotate("text",x = 5, y = 4,label = "a", size = 4)+
+  annotate("text",x = 6, y = 5.5,label ="a", size = 4) +
+  theme(legend.position = "none") 
+b
 
 
 # plant height ####
 ## regression of plant height ####
-fitplantheight <-  lm(data$plant_ht ~ trt_num, data = data)
+
+fitplantheight <-  lm(log(plant_ht) ~ trt, data = harvest)
 summary(fitplantheight)
 
 ## ANOVA plant height ####
-anova <-  aov (plant_ht ~ trt_fac*variety+ block, data = data); 
-summary(anova)
-shapiro.test(anova$residuals) ## data does not follow assumptions of ANOVA
-
+anova_ph <-  aov (plant_ht ~ trt_fac*variety+ block, data = harvest); 
+summary(anova_ph)
+shapiro.test(anova_ph$residuals) ## data does not follow assumptions of ANOVA
+par(mfrow=c(2,2)) 
+plot(anova_ph)
 ## log transformation of plant height ####
 
-data$plant_ht_log = log(data$plant_ht)
+harvest$plant_ht_log = log(harvest$plant_ht)
 
-## regression of plant height ####
-
-fitplantheight <-  lm(data$plant_ht_log ~ trt_num, data = data)
-summary(fitplantheight)
 
 ## anova of log transformed plant height ####
 
-anova_plht <-  aov (plant_ht_log ~ trt_fac*variety+ block, data = data); 
+anova_plht <-  aov (plant_ht_log ~ trt_fac*variety+ block, data = harvest); 
 summary(anova_plht)
 shapiro.test(anova_plht$residuals)
+h = plot(anova_plht); h
 
 ## HSD using nitrogen rates as factor ####
 
 hsd_plant_height <- HSD.test (anova_plht, trt = c("trt_fac"))
 hsd_plant_height
 
-plht = as.data.frame((hsd_plant_height$means)); plht
-plht$trt_fac <- c("0", "112","168", "224", "280", "56")
-plht
+mydata2 = harvest%>%select(trt_fac, variety, plant_ht) 
 
-plht$trt_fac <- factor(plht$trt_fac,levels = c("0","56","112","168","224","280"))
+D <-  mydata2 %>%
+  group_by( trt_fac) %>%
+  summarize(mean = mean(plant_ht), sd = sd(plant_ht), se = sd/sqrt(8))
 
-b = ggplot(plht, aes(x = trt_fac, y = plant_ht_log, fill = trt_fac))+
-  geom_bar(stat="identity",position=position_dodge(), color="black",  ## stat equal to identity means avde jehra yield ala result a ohi number use krna na k jive hunda bar graph ch count use krn ala)
-           width = 0.7)+
-  labs(y = "Log(Plant height (cm))", x = "N rates (kg/ha)") + 
-  scale_fill_viridis_d(option = "D", direction = -1)+
-  geom_errorbar(aes(ymin = plant_ht_log - ((std)/sqrt(24)), ymax = plant_ht_log + ((std)/sqrt(24))), width=.2,
-                position=position_dodge(0.9))+
-  theme_bw() + 
-  geom_text(data = plht,
-            aes(y = plant_ht_log + ((std)/sqrt(24)) + 0.2, label=c("b","a","a","a","a","a"),vjust=0))+
-  theme(legend.position = "none") + 
-  theme(axis.text=element_text(size=9,face="bold" ),
-        axis.title=element_text(size=9,face="bold"))+
-  scale_y_continuous(breaks = seq(0, 5, 1))
-b 
+b <-  ggplot(D, aes(y = mean, x = trt_fac, fill = trt_fac)) + 
+  geom_bar(position = "dodge", stat = "identity", color="black", width = 0.8) +
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se), width=.2,
+                position = position_dodge(0.9))+
+  theme_bw() + labs(y = "Plant height (cm)", x = "N rates (kg/ha)")+
+  scale_fill_viridis_d(option = "D", direction = -1, name = "Races")+
+  annotate("text", x = 1, y = 37,label = "b", size = 4)+
+  annotate("text",x = 2, y = 69, label = "a", size = 4)+
+  annotate("text",x = 3, y = 70, label = "a", size = 4)+
+  annotate("text",x = 4, y = 102,label = "a", size = 4)+
+  annotate("text",x = 5, y = 74,label = "a", size = 4)+
+  annotate("text",x = 6, y = 74,label ="a", size = 4) +
+  theme(legend.position = "none") 
+b
 
+ggsave("Plant_height_n_rates.png", b, dpi=600, width = 8, height = 8, units = "cm" )
 
-ggsave("Plant_height_n_rates_log.png", b, dpi=600, width = 8, height = 8, units = "cm" )
 
 ## HSD using varieties as factor ####
 
 hsd_plant_height2 <-  HSD.test(anova_plht, trt = c( "variety")); hsd_plant_height2
 
-plht2 <-  as.data.frame((hsd_plant_height2$means)); plht2
-plht2$variety <- c("Bialobrzeskie", "X-59")
+mydata2 = harvest%>%select(trt_fac, variety, plant_ht) 
 
-plht2
+C <-  mydata2 %>%
+  group_by( variety) %>%
+  summarize(mean = mean(plant_ht), sd = sd(plant_ht), se = sd/sqrt(8))
 
-
-a <-  ggplot(plht2, aes(x = variety, y = plant_ht_log, fill = variety))+
-  geom_bar(stat="identity",position=position_dodge(), color="black",  ## stat equal to identity means avde jehra yield ala result a ohi number use krna na k jive hunda bar graph ch count use krn ala)
-           width = 0.7)+
-  labs(y = "log (Plant height (cm))", x = "Variety") +
-  scale_fill_viridis_d(option = "D", direction = -1)+
-  geom_errorbar(aes(ymin = plant_ht_log - ((std)/sqrt(24)), ymax = plant_ht_log + ((std)/sqrt(24))), width=.2,
-                position=position_dodge(0.9))+
-  theme_bw() + ylim(c(0,5)) + 
-  geom_text(data = plht2,
-            aes( y = plant_ht_log + ((std)/sqrt(24)) + 0.2, label=c("a","b"),vjust=0))+
-  theme(legend.position = "none")+
-  theme(axis.text=element_text(size=9,face="bold" ),
-        axis.title=element_text(size=9,face="bold"))
+c <-  ggplot(C, aes(y = mean, x = variety, fill = variety)) + 
+  geom_bar(position = "dodge", stat = "identity", width = 0.8, color = "black") +
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se), width=.2,
+                position = position_dodge(0.9))+
+  theme_bw() + labs(y = "Plant height (cm)", x = "Varieties")+
+  scale_fill_viridis_d(option = "D", direction = -1, name = "Races")+
+  annotate("text", x = 1, y = 95,label = "a", size = 4)+
+  annotate("text",x = 2, y = 45, label = "b", size = 4)+
+  theme(legend.position = "none") 
+c
   
-  
-  a 
-
-
-
-ggsave("Plant_height_variety_log.png", a, dpi=600, width = 8, height = 8, units = "cm" )
-
-
+ggsave("Plant_height_variety.png", c, dpi=600, width = 8, height = 8, units = "cm" )
 
 
 ## Biomass analysis
-fitbiomass <-  lm(dry_biomass_yield ~ trt, data = data)
-summary(fitbiomass)
+fitbiomass <-  lm(biomass_yield ~ trt, data = harvest)
+summary(fitbiomass) ## p value is significant 
 
-anova <- aov(dry_biomass_yield ~ trt_fac*variety + block, data = data)
-summary(anova)
-shapiro.test(anova$resid)  #### data follows normal distribution
 
-HSDbiomass<- HSD.test (anova, "trt_fac")
+anova_biomass <- aov(biomass_yield ~ trt_fac*variety + block, data = harvest)
+summary(anova_biomass)
+shapiro.test(anova_biomass$resid)  #### data follows normal distribution
+par(mfrow=c(2,2)) 
+plot(fitbiomass)
+HSDbiomass<- HSD.test (anova_biomass, "trt_fac")
 HSDbiomass
 
-shapiro.test(anova$resid)
+shapiro.test(anova_biomass$resid)
 biomass <-  as.data.frame(HSDbiomass$means); biomass
 biomass$trt_fac <- c("0","112","168", "224", "280", "56")
 biomass
@@ -407,16 +379,16 @@ biomass$trt_fac <- factor(biomass$trt_fac, levels = c("0","56","112","168","224"
 
 library(ggplot2)
 
-f <- ggplot(biomass, aes(x = trt_fac, y = dry_biomass_yield  , fill = trt_fac))+
-  geom_bar(stat="identity",position=position_dodge(), color="black",  ## stat equal to identity means avde jehra yield ala result a ohi number use krna na k jive hunda bar graph ch count use krn ala)
-           width = 0.7)+
+f <- ggplot(biomass, aes(x = trt_fac, y = biomass_yield  , fill = trt_fac))+
+  geom_bar(stat="identity",position=position_dodge(), color="black", 
+           width = 0.8)+
   labs(y = " Dry biomass yield (kg/ha)", x = "N rates (kg/ha)") + 
   scale_fill_viridis_d(option = "D", direction = -1)+
-  geom_errorbar(aes(ymin = dry_biomass_yield - ((std)/sqrt(r)), ymax = dry_biomass_yield + ((std)/sqrt(r))), width =.2,
+  geom_errorbar(aes(ymin = biomass_yield - ((std)/sqrt(r)), ymax = biomass_yield + ((std)/sqrt(r))), width =.2,
                 position = position_dodge(0.9))+
   theme_light()+ 
   geom_text(data=biomass,
-            aes( y = dry_biomass_yield + ((std)/sqrt(r)) + 10, label=c("b","a","a","ab","ab","ab")),vjust=0)+
+            aes( y = biomass_yield + ((std)/sqrt(r)) + 10, label=c("b","a","a","ab","ab","ab")),vjust=0)+
   theme(legend.position = "none")+
   theme(axis.text=element_text(size = 9,face= "bold" ),
         axis.title=element_text(size = 9,face= "bold"))+
@@ -425,6 +397,95 @@ f
 
 
 
-ggsave("dry_biomass_yield.png", f, dpi=600, width = 8, height = 8, units = "cm" )
+ggsave("biomass_yield.png", f, dpi=600, width = 8, height = 8, units = "cm" )
 
+# regression analysis of plant nutrient concentration with nitrogen applied ####
+
+nitrogen = lm (N ~ trt, data = harvest)
+summary(nitrogen)
+
+nitrogen2 = lm (N ~ trt + I(trt^2), data = harvest)
+summary(nitrogen2)  ## nitrogen application has not shown impact on nitrogen concentration in plant
+
+A = ggplot(harvest, aes(trt, N)) +
+  geom_point()+
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = T)+
+  stat_regline_equation(aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+                        formula = y ~ poly(x, 2, raw = TRUE)) +
+  theme_bw()+ ylim(c(0,4))+
+  labs(y = "N concentration (%)", x = "N rates (kg/ha)")+
+  scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))+
+  theme(axis.text=element_text(size=9,face="bold" ),
+        axis.title=element_text(size=9,face="bold"))
+
+
+sulphur = lm (S ~ trt + variety +trt:variety, data = harvest)
+summary(sulphur)  ## linear equation fits better 
+
+sulphur2 = lm(S ~ trt + I(trt^2), data = harvest)
+summary(sulphur2)
+
+B = ggplot(harvest, aes(trt, S)) +
+  geom_point()+
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = T)+
+  stat_regline_equation(aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+                        formula = y ~ poly(x, 2, raw = TRUE)) +
+  theme_bw()+ ylim(c(0,0.45))+
+  labs(y = "S concentration (%)", x = "N rates (kg/ha)")+
+  scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))+
+  theme(axis.text=element_text(size=9,face="bold" ),
+        axis.title=element_text(size=9,face="bold"))
+
+phosphorus = lm(P ~ trt + variety, data = harvest)
+summary(phosphorus)
+
+phosphorus2 = lm(P~ trt + I(trt^2), data = harvest)
+summary(phosphorus2) ## quadratic equation fits better
+
+C = ggplot(harvest, aes(trt, P)) +
+  geom_point()+
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = T)+
+  stat_regline_equation(aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+                        formula = y ~ poly(x, 2, raw = TRUE)) +
+  theme_bw()+ ylim(c(0,2))+
+  labs(y = "P concentration (%)", x = "N rates (kg/ha)")+
+  scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))+
+  theme(axis.text=element_text(size=9,face="bold" ),
+        axis.title=element_text(size=9,face="bold"))
+
+potassium = lm(K ~ trt + variety + trt:variety , data = harvest)
+summary(potassium) 
+
+potassium2 = lm(K ~ trt+ I(trt^2), data = harvest)
+summary(potassium2) ## quadratic equation fits better
+
+D = ggplot(harvest, aes(trt, K)) +
+  geom_point()+
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2, raw = TRUE), se = T)+
+  stat_regline_equation(aes(label =  paste(..eq.label.., ..adj.rr.label.., sep = "~~~~")),
+                        formula = y ~ poly(x, 2, raw = TRUE)) +
+  theme_bw()+ ylim(c(0,3.5))+
+  labs(y = "K concentration (%)", x = "N rates (kg/ha)")+
+  scale_x_continuous(breaks = c(0, 56, 112, 168, 224, 280))+
+  theme(axis.text=element_text(size=9,face="bold" ),
+        axis.title=element_text(size=9,face="bold"))
+D
+
+E= ggarrange(A, B, C , D,  
+             labels = c("A", "B", "C", "D"),
+             ncol = 2, nrow = 2)
+E
+
+ggsave("Regression_nutrient_concentration.png", E ,dpi=600, width = 30, height = 20, units = "cm" )
+
+
+
+
+
+
+
+
+
+
+ 
 
