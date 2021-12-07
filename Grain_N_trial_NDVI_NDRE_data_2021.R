@@ -1,5 +1,5 @@
 ## For NDVI data ##\
-setwd("~/Desktop/Agronomic-problems/Agronomic-problems")
+setwd("~/Desktop/Agronomic-problems")
 rm(list = ls())
 library(tidyverse)
 library(dplyr)
@@ -34,24 +34,24 @@ ndvi_sd <-  summarise(grouped_data,  ndvi_1_sd = sd(ndvi_1), ndvi_2_sd = sd(ndvi
 
 # log transformation of data ####
 
-mydata$seed_yield_log <-  log(mydata$seed_yield)
+mydata$grain_yield_log <-  log(mydata$grain_yield)
 mydata$ndvi_5_log <-  log(mydata$ndvi_5+1)
 ndvi_5_log_sq <-  (mydata$ndvi_5_log^2)
 mydata$dry_biomass_yield_log = log(mydata$dry_biomass_yield)
 
 
 # fitting regression model 
-fit1<- lm(seed_yield_log~ ndvi_5_log, data=mydata)
+fit1<- lm(grain_yield_log~ ndvi_5_log, data=mydata)
 e <-  summary(fit1); e   ## model is not a good fit 
 
 
 ## quadratic model #### 
 
-fit2 <- lm(seed_yield_log ~ poly(ndvi_5_log, 2, raw = TRUE), data = mydata)
+fit2 <- lm(grain_yield_log ~ poly(ndvi_5_log, 2, raw = TRUE), data = mydata)
 summary (fit2)
 coefficients(fit2)
 
-fit3 <- lm(seed_yield_log ~ ndvi_5_log, data = mydata)
+fit3 <- lm(grain_yield_log ~ ndvi_5_log, data = mydata)
 summary (fit3)
 coefficients(fit3)
 
@@ -85,8 +85,8 @@ ggplot(datalong, aes(value, dry_biomass_yield)) +
   labs( y = "Dry biomass yield (kg/ha)", x = "NDVI")
 
 
-# fitting linear model between seed yield and ndvi ####
-ggplot(datalong, aes(value, seed_yield)) +
+# fitting linear model between grain yield and ndvi ####
+ggplot(datalong, aes(value, grain_yield)) +
   geom_point()+
   geom_smooth(method = "lm", formula = y ~ poly(x, 1, raw = TRUE), se = T) +
   stat_regline_equation(aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
@@ -96,7 +96,7 @@ ggplot(datalong, aes(value, seed_yield)) +
         axis.title=element_text(size=9,face="bold"))+
   facet_wrap(~measure, labeller = labeller (
     measure = variable_names), nrow = 2)+
-  labs( y = "Seed yield (kg/ha)", x = "NDVI")
+  labs( y = "Grain yield (kg/ha)", x = "NDVI")
 
 ## regression between dry biomass and ndvi; none of the model is good fit. Reason could be high weed pressure in the field 
 
