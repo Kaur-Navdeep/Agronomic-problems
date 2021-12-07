@@ -1,9 +1,11 @@
 # For inseason data ##
 # setting working directory ####
-setwd("~/Desktop/Agronomic-problems/Agronomic-problems")
+setwd("~/Desktop/Agronomic-problems")
 rm(list = ls())
 library(tidyverse)
 library(ggplot2)
+library(agricolae)
+library(ggpubr)
 inseason <- read_csv("Grain_N_trial_inseason_data_2021.csv")
 
 # converting data into factors and numeric ####
@@ -26,7 +28,7 @@ x59$no_of_male_plants <- as.numeric(x59$no_of_male_plants)
 # Female to male ratio using mutate command #####
 
 sex_ratio <- mutate(x59,
-       female_to_male_ratio = no_of_female_plants/no_of_male_plants)
+                    female_to_male_ratio = no_of_female_plants/no_of_male_plants)
 sex_ratio
 
 # anova for sex ratio ####
