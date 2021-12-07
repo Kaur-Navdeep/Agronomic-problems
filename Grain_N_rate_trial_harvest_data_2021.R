@@ -68,11 +68,11 @@ x59_yield <-  summarise(x59group, average_yield = mean(grain_yield, na.rm = TRUE
 
 options(scipen = 999)
 
-## MRTN Bialobrezeskie using averged data, taking N price as $2.83/Kg and Hemp seed price as $550/Kg ##
+## MRTN Bialobrezeskie using averged data, taking N price as $2.83/Kg and Hemp grain price as $550/Kg ##
 mrtn_bia <- mutate(bia_yield,
                    fertilizer_price = trt * 2.83, mrtn = ((average_yield- 53.3375)*550) - (fertilizer_price))
 mrtn_bia
-## MRTN X-59 using averaged data, taking N price as $2.83/Kg and Hemp seed price as $550/Kg
+## MRTN X-59 using averaged data, taking N price as $2.83/Kg and Hemp grain price as $550/Kg
 
 mrtn_x59 <- mutate(x59_yield,
                    fertilizer_price = x59_yield$trt*2.83, mrtn = ((x59_yield$average_yield- 39.6600)*550) - (x59_yield$trt*2.83))
@@ -80,7 +80,7 @@ mrtn_x59
 
 grouped_data <-  group_by(harvest, trt)
 ## average data ####
-average <-  summarise(grouped_data,  no_of_plants_average = mean(no_of_plants), biomass_yield_average = mean(biomass_yield), aboveground_residue_wt_average = mean(aboveground_residue_wt), plant_ht = mean(plant_ht), seed_yield_average = mean(grain_yield), na.rm = TRUE)
+average <-  summarise(grouped_data,  no_of_plants_average = mean(no_of_plants), biomass_yield_average = mean(biomass_yield), aboveground_residue_wt_average = mean(aboveground_residue_wt), plant_ht = mean(plant_ht), grain_yield_average = mean(grain_yield), na.rm = TRUE)
 average 
 ## Standard deviation ####
 sd <-  summarise(grouped_data,  no_of_plants_sd = sd(no_of_plants), biomass_yield_sd = sd(biomass_yield), aboveground_plant_residue_weight_sd = sd(aboveground_residue_wt), plant_ht_sd = sd(plant_ht),grain_yield_sd = sd(grain_yield), na.rm = TRUE)
@@ -99,7 +99,7 @@ ggplot(harvest, aes(x = trt_fac, y = plant_ht, color = variety) ) +
 
 ggplot(data = harvest)+ 
   geom_point(mapping = aes(x = trt_fac, y = grain_yield_per_plant, shape = variety))+
-  labs (x = "N rates (kg/ha)", y = "Seed yield per plant (grams)") + theme_linedraw()
+  labs (x = "N rates (kg/ha)", y = "Grain yield per plant (grams)") + theme_linedraw()
 
 ggplot(data = harvest)+ 
   geom_point(mapping = aes(x = trt_fac, y = N)) +
@@ -141,10 +141,10 @@ ggplot(data = harvest)+
 
 ## week 8 statistics
 
-##  regression analysis of seed yield ####
-seedyield <- harvest%>%select(grain_yield, biomass_yield, plant_ht, root_wt, no_of_plants, trt)
+##  regression analysis of grain yield ####
+grainyield <- harvest%>%select(grain_yield, biomass_yield, plant_ht, root_wt, no_of_plants, trt)
 
-pairs(seedyield)
+pairs(grainyield)
 
 y <- harvest$grain_yield
 x1 <- harvest$biomass_yield
@@ -192,7 +192,7 @@ shapiro.test(anova_gy$resid)
 plot(anova_gy)
 
 
-# seed yield ####
+# grian yield ####
 ## log transformation of grain yield ####
 
 harvest$grain_yield_log = log(harvest$grain_yield)
@@ -237,7 +237,7 @@ ggsave("Grain_yield.png", a, dpi=600, width = 8, height = 8, units = "cm" )
 
 
 
-## anova seed yield per plant ####
+## anova grain yield per plant ####
 anova_pp <-  aov (grain_yield_per_plant ~ trt_fac*variety + block, data = harvest);
 summary(anova_pp)
 shapiro.test(anova_pp$resid)  
