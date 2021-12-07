@@ -7,7 +7,7 @@ library(agricolae)
 library(ggplot2)
 library(ggpubr)
 
-setwd("~/Desktop/Agronomic-problems/Agronomic-problems")
+setwd("~/Desktop/Agronomic-problems")
 ### For harvest data analysis ##
 harvest <- read.csv("Grain_N_rate_trial_harvest_data_2021.csv") ## opening file 
  ## converting N rates into numeric values for calculation 
