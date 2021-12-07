@@ -1,4 +1,5 @@
-Agronomic-problems project includes analysis of one-year data collected in the field from the grain hemp nitrogen trial conducted in summer 2021. This experiment was conducted in the sandy soils of central Florida. Two hemp varieties, i.e., X-59 and Bialobrzeskie, were sown on 4 May 2021 in randomized complete block design with factorial treatment design. Six nitrogen rates i.e., 0, 56, 112, 168, 224 & 280 kg/ha were applied using urea as a nitrogen source. Further details of the data collected are provided in the wiki.                                                                                                                            
+Agronomic-problems project includes analysis of one-year data collected in the field from the grain hemp nitrogen trial conducted in summer 2021. This experiment was conducted in the sandy soils of central Florida. Two hemp varieties, i.e., X-59 and Bialobrzeskie, were sown on 4 May 2021 in randomized complete block design with factorial treatment design. Six nitrogen rates i.e., 0, 56, 112, 168, 224 & 280 kg/ha were applied using urea as a nitrogen source. Further details of the data collected are provided in the wiki.     
+
 For project review, there are three CSV format files named; Grain_N_rate_trial_harvest_data_2021.csv (all data collected at harvesting), Grain_N_trial_inseason_data_2021.csv (data collected during crop growth season), and Grain_N_trial_NDVI_NDRE_data_2021.csv (data collected by the handheld sensor). Along with these, there are three R files (Grain_N_rate_trial_harvest_data_2021.R, Grain_N_trial_inseason_data_2021_2.R, Grain_N_trial_NDVI_NDRE_data_2021.R) which include codes for the data analysis.
 
 **Learning experience:** 
@@ -6,7 +7,7 @@ This course offered a great learning experience. I acknowledge that Dr. Zachary 
 For future students, this course could be a great learning experience too. Consistent efforts are essential to learning new skills like R. Try exploring other sources and watching youtube videos related to the course besides the readings provided; this can help a lot. This course provides the direction to move, and then we can explore further.  
 
 **Course assessment questions:** 
-Were the readings effective in providing background information to complete the assignment?
+Were the readings effective in providing background information to complete the assignment?                                                                        
 Answer - Yes, the readings were constructive and provided background information for completing the assignment.
 
 Were the assignments helpful to practice programming topics presented in the reading? 
