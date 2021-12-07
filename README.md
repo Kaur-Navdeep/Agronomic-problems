@@ -6,14 +6,14 @@ For project review, there are three CSV format files named; Grain_N_rate_trial_h
 This course offered a great learning experience. I acknowledge that Dr. Zachary Brym was instrumental in my completing this course. I was completely new to R and git hub when I started this course. The first few weeks were a bit of a struggle because of the constant errors I experienced in my code files. But eventually, I learned how to fix errors. I learned that consistent efforts are required to learn new skills from this. Along with that design of the project and dividing it into weeks helped me understand and keep easy track of the project. Readings helped solve most of my questions. While doing analysis, I learned how to proceed with the analysis, like starting with essential data management and visualization and then moving on to statistical models. Issues tab on git hub was beneficial whenever I experienced errors and posted that as an issue and got them solved from Dr. Zachary Brym's guidance. Since this was a self-paced course, I can complete it based on my schedule.                                                                                                                   
 For future students, this course could be a great learning experience too. Consistent efforts are essential to learning new skills like R. Try exploring other sources and watching youtube videos related to the course besides the readings provided; this can help a lot. This course provides the direction to move, and then we can explore further.  
 
-**Course assessment questions:** 
+**Course assessment questions:**                                                                                                                                    
 Were the readings effective in providing background information to complete the assignment?                                                                        
 Answer - Yes, the readings were constructive and provided background information for completing the assignment.
 
-Were the assignments helpful to practice programming topics presented in the reading? 
+Were the assignments helpful to practice programming topics presented in the reading?                                                                              
 Answer – Yes, I appreciate that assignments provided us with a way to see analysis and readings. There was a lot of information in the reading; assignments helped me extract the vital information that otherwise I could lose. All the codes and commands provided in the assignments were beneficial not only for the project but also for future analysis. 
 
-Was the course effectively structured around your analysis plan? 
+Was the course effectively structured around your analysis plan?                                                                                                  
 Answer – Yes, the course was effectively structured around the analysis plan.
 
 What was your favorite thing about the course? 
