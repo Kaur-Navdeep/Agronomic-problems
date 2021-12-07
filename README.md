@@ -7,17 +7,17 @@ This course offered a great learning experience. I acknowledge that Dr. Zachary 
 For future students, this course could be a great learning experience too. Consistent efforts are essential to learning new skills like R. Try exploring other sources and watching youtube videos related to the course besides the readings provided; this can help a lot. This course provides the direction to move, and then we can explore further.  
 
 **Course assessment questions:**                                                                                                                                    
-Were the readings effective in providing background information to complete the assignment?                                                                        
+Were the readings effective in providing background information to complete the assignment?                                                                       
 Answer - Yes, the readings were constructive and provided background information for completing the assignment.
 
-Were the assignments helpful to practice programming topics presented in the reading?                                                                              
+Were the assignments helpful to practice programming topics presented in the reading?                                                                             
 Answer – Yes, I appreciate that assignments provided us with a way to see analysis and readings. There was a lot of information in the reading; assignments helped me extract the vital information that otherwise I could lose. All the codes and commands provided in the assignments were beneficial not only for the project but also for future analysis. 
 
 Was the course effectively structured around your analysis plan?                                                                                                  
 Answer – Yes, the course was effectively structured around the analysis plan.
 
-What was your favorite thing about the course? 
+What was your favorite thing about the course?                                                                                                                    
 Answer – My favorite thing was that assignments were framed and the issues tab.
 
-How can the course be improved for future students? 
+How can the course be improved for future students?                                                                                                               
 Answer – I was entirely new to git hub and had some idea about the preface of R when I started this course. Understanding the git hub preface and then using terminal and repositories was difficult. I believe providing a link to some videos and the written readings explaining using GitHub and R will be helpful. 
