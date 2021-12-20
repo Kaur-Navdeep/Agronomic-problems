@@ -1,5 +1,5 @@
-# For inseason data ##
-# setting working directory ####
+# Analysis of data collected from sowing to harvesting stage (excludes data collected during harvesting) of hemp (Cannabis sativa L.) in summer 2021 in PSREU, Citra
+# Reminder: create and set your working directory!
 setwd("~/Desktop/Agronomic-problems")
 rm(list = ls())
 library(tidyverse)
@@ -12,7 +12,7 @@ inseason <- read_csv("Grain_N_trial_inseason_data_2021.csv")
 inseason$block <-  as.factor(inseason$block)
 inseason$variety <- as.factor(inseason$variety)
 inseason$trt_fac <- as.factor(inseason$trt)
-inseason$plot_no.<- as.factor(inseason$plot_no.)
+inseason$plot_no <- as.factor(inseason$plot_no)
 inseason$days_50_per_flowering <- as.numeric(inseason$days_50_per_flowering)
 
 
@@ -29,7 +29,7 @@ x59$no_of_male_plants <- as.numeric(x59$no_of_male_plants)
 
 sex_ratio <- mutate(x59,
                     female_to_male_ratio = no_of_female_plants/no_of_male_plants)
-sex_ratio
+
 
 # anova for sex ratio ####
 sex_ratio_anova = aov(female_to_male_ratio ~ trt_fac + block, data = sex_ratio)
@@ -45,7 +45,7 @@ grouped_data <- group_by(inseason, trt_fac, variety)
 
 # average data across different variables ####
 average <- summarise(grouped_data,  germination_percentage_average = mean(sulfur), stand_establishment_average = mean(stand_establishment), plant_ht_1_average = mean(plant_ht_1), plant_ht_2_average = mean(plant_ht_2), plant_ht_3_average = mean(plant_ht_3), plant_ht_4_average = mean(plant_ht_4), plant_ht_5_average = mean(plant_ht_5), days_50_per_flowering_average = mean(days_50_per_flowering), na.rm = TRUE)
-average
+
 # standard deviation across different variables ####
 sd <-  summarise(grouped_data,  germination_percentage_sd = sd(germination_percentage), stand_establishment_sd = sd(stand_establishment), plant_ht_1_sd = sd(plant_ht_1), plant_ht_2_sd = sd(plant_ht_2), plant_ht_3_sd = sd(plant_ht_3), plant_ht_4_sd = sd(plant_ht_4), plant_ht_5_sd = sd(plant_ht_5), days_50_per_flowering_sd = sd(days_50_per_flowering), na.rm = TRUE)
 
@@ -76,7 +76,7 @@ a <-  ggplot(D, aes(fill = trt_fac, y = mean, x = variety)) +
                 position = position_dodge(0.9))+
   theme_bw() + labs(y = "Sulfur concentration in plants (%)", x = "Varieties")+
   scale_fill_viridis_d(option = "D", direction = -1, name = "N rates")+
-  annotate("text",x=1.62,y=0.5,label="a", size=3)+
+  annotate("text",x=0.1,y=0.5,label="a", size=3)+
   annotate("text",x=1.78,y=0.25,label="b", size=3)+
   annotate("text",x=1.92,y=0.22, label="b", size=3)+
   annotate("text",x=2.08,y=0.25,label="b", size=3)+
