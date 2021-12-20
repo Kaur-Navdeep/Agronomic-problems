@@ -1,4 +1,5 @@
-## For NDVI data ##\
+# Analysis of data collected NDVI and NDRE using Hollands handheld sensor in hemp (Cannabis sativa L.) in summer 2021 in PSREU, Citra
+# Reminder: create and set your working directory!
 setwd("~/Desktop/Agronomic-problems")
 rm(list = ls())
 library(tidyverse)
@@ -13,7 +14,7 @@ mydata <-  read.csv("Grain_N_trial_NDVI_NDRE_data_2021.csv")
 mydata$block <-  as.factor(mydata$block)
 mydata$variety <-  as.factor(mydata$variety)
 mydata$trt_fac <- as.factor(mydata$trt)
-mydata$plot_no.<- as.factor(mydata$plot_no.)
+mydata$plot_no<- as.factor(mydata$plot_no)
 
 # filtering data based on varieties ####
 
