@@ -1,4 +1,4 @@
-plot_no.,variety,trt,block,no_of_plants ,plant_ht,biomass_yield,aboveground_residue_wt,root_wt,grain_yield ,grain_yield_per_plant,S,K,P,N
+plot_no,variety,trt,block,no_of_plants ,plant_ht,biomass_yield,aboveground_residue_wt,root_wt,grain_yield ,grain_yield_per_plant,S,K,P,N
 101,Bialobrzeskie,56,1,23,91.44,437.64,350.11,109.2896175,87.53,0.695652174,0.217977528,1.976379526,0.609837703,1.885813149
 102,X-59,224,1,12,40.89,678.34,503.29,54.64480874,175.05,2.666666667,0.173426573,2.708241758,0.61988012,1.874383021
 103,Bialobrzeskie,168,1,19,216.41,1378.56,1115.98,174.863388,262.58,2.526315789,0.153035224,2.356532601,0.636622533,1.904082636

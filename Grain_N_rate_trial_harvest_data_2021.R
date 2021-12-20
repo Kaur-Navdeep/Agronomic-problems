@@ -1,5 +1,5 @@
-
-
+# Analysis of data collected at harvesting stage of hemp (Cannabis sativa L.) in summer 2021 in PSREU, Citra
+# Reminder: create and set your working directory!
 ### Week 4 and 5 ###
 rm(list = ls())
 library(tidyverse)
@@ -15,9 +15,8 @@ harvest <- read.csv("Grain_N_rate_trial_harvest_data_2021.csv") ## opening file
 # converting variables into factors factors ####
 harvest$block <-  as.factor(harvest$block)
 harvest$variety <-  as.factor(harvest$variety)
-str(harvest$variety)
 harvest$trt_fac <- as.factor(harvest$trt)
-harvest$plot_no.<- as.factor(harvest$plot_no.)
+harvest$plot_no<- as.factor(harvest$plot_no)
 
 
 # filtering data according to two varieties ####
@@ -52,39 +51,39 @@ for (i in 6:ncol (mydata)){
 ## based on graphical visualization, grain yield, plant height and grain yield per plant does not seem to be normally distributed. 
 
 # grouping data according to N rates and then get average yield in all N rates using summarise command ####
-averyield <-  group_by(harvest, trt); averyield
-summary_yield <-  summarise(averyield, average_yield = mean(grain_yield), average_grain_yield_per_plant = mean(grain_yield_per_plant), na.rm = TRUE);summary_yield
+averyield <-  group_by(harvest, trt)
+summary_yield <-  summarise(averyield, average_yield = mean(grain_yield), average_grain_yield_per_plant = mean(grain_yield_per_plant), na.rm = TRUE)
 
 
 ## grouping yield data of Bialobrezeskie and average yield as per N rates ####
-biagroup <-  group_by(bia, trt); biagroup
-bia_yield <-  summarise(biagroup, average_yield = mean(grain_yield, na.rm = TRUE)); bia_yield
+biagroup <-  group_by(bia, trt)
+bia_yield <-  summarise(biagroup, average_yield = mean(grain_yield, na.rm = TRUE))
 
 
 
 ## grouping yield data of X-59 and average yield as per N rates ####
-x59group <-  group_by(x59, trt); x59group
-x59_yield <-  summarise(x59group, average_yield = mean(grain_yield, na.rm = TRUE)); x59_yield
+x59group <-  group_by(x59, trt)
+x59_yield <-  summarise(x59group, average_yield = mean(grain_yield, na.rm = TRUE))
 
 options(scipen = 999)
 
 ## MRTN Bialobrezeskie using averged data, taking N price as $2.83/Kg and Hemp grain price as $550/Kg ##
 mrtn_bia <- mutate(bia_yield,
                    fertilizer_price = trt * 2.83, mrtn = ((average_yield- 53.3375)*550) - (fertilizer_price))
-mrtn_bia
+
 ## MRTN X-59 using averaged data, taking N price as $2.83/Kg and Hemp grain price as $550/Kg
 
 mrtn_x59 <- mutate(x59_yield,
                    fertilizer_price = x59_yield$trt*2.83, mrtn = ((x59_yield$average_yield- 39.6600)*550) - (x59_yield$trt*2.83))
-mrtn_x59
+
 
 grouped_data <-  group_by(harvest, trt)
 ## average data ####
 average <-  summarise(grouped_data,  no_of_plants_average = mean(no_of_plants), biomass_yield_average = mean(biomass_yield), aboveground_residue_wt_average = mean(aboveground_residue_wt), plant_ht = mean(plant_ht), grain_yield_average = mean(grain_yield), na.rm = TRUE)
-average 
+
 ## Standard deviation ####
 sd <-  summarise(grouped_data,  no_of_plants_sd = sd(no_of_plants), biomass_yield_sd = sd(biomass_yield), aboveground_plant_residue_weight_sd = sd(aboveground_residue_wt), plant_ht_sd = sd(plant_ht),grain_yield_sd = sd(grain_yield), na.rm = TRUE)
-sd
+
 
 # data visualization using ggplot week 6 and 7 ####
 
@@ -146,40 +145,34 @@ grainyield <- harvest%>%select(grain_yield, biomass_yield, plant_ht, root_wt, no
 
 pairs(grainyield)
 
-y <- harvest$grain_yield
-x1 <- harvest$biomass_yield
-x2 <- harvest$plant_ht
-x3 <- harvest$root_wt
-x4 <- harvest$no_of_plants
-x5 <- harvest$trt
 
-fit1 <- lm(y ~ x1)
-fit2 <- lm(y ~ x1 + x2)
-fit3 <- lm(y ~ x1 + x2 + x3)
-fit4 <- lm(y ~ x1 + x2 + x3 + x4 + x5)
+gy_1 <- lm(grain_yield ~ biomass_yield, data = grainyield)
+gy_2 <- lm(grain_yield ~ biomass_yield + plant_ht, data = grainyield)
+gy_3 <- lm(grain_yield ~ biomass_yield + plant_ht + root_wt, data = grainyield)
+gy_4 <- lm(grain_yield ~ biomass_yield + plant_ht + root_wt + no_of_plants + trt, data = grainyield)
 
-summary(fit1)
-summary(fit2)
-summary (fit3)
-summary(fit4)
+summary(gy_1)
+summary(gy_2)
+summary (gy_3)
+summary(gy_4)
 
-## best adjusted R2 is for fit 3 and fit 4
+## best adjusted R2 is for gy_3 and gy_4
 
-anova(fit3, fit4) 
+anova(gy_3, gy_4) 
 
-## there is no significant difference between these two models, there we can consider reduced model i.e. fit3
+## there is no significant difference between these two models, there we can consider reduced model i.e. gy_3
 
-anova (fit2, fit4)
+anova (gy_2, gy_4)
 
-## there is no significant difference between these two models, there we can consider reduced model i.e. fit2
+## there is no significant difference between these two models, there we can consider reduced model i.e. gy_2
 
-anova (fit1, fit2)
+anova (gy_1, gy_2)
 
-## there is difference between models, model fit2 is best and explains 
+## there is difference between models, model gy_2 is best and explains 
 
-backAIC <- step(fit4, direction = "backward")
+backAIC <- step(gy_4, direction = "backward")
 
-## based on backward selection model, fit 2 is best
+## based on backward selection model, gy_2 is best
 
 
 
@@ -204,11 +197,10 @@ str(harvest$grain_yield_log)
 anova_gy_log <-  aov (grain_yield_log ~ trt_fac*variety + block, data = harvest)
 summary(anova_gy_log)
 shapiro.test(anova_gy_log$resid)
-
+par(mfrow = c(2,2))
 plot(anova_gy_log)  ## plots look good with some outliers, which could be removed by two year data
 
 hsdgrainyield <- HSD.test (anova_gy_log, "trt_fac")
-hsdgrainyield
 
 mydata1 = harvest%>%select(trt_fac, variety, grain_yield) 
 
@@ -241,7 +233,7 @@ ggsave("Grain_yield.png", a, dpi=600, width = 8, height = 8, units = "cm" )
 anova_pp <-  aov (grain_yield_per_plant ~ trt_fac*variety + block, data = harvest);
 summary(anova_pp)
 shapiro.test(anova_pp$resid)  
-
+par(mfrow = c(2,2))
 plot(anova_pp)  # based on shapiro and graphs data does not follow assumptions of ANOVA
 
 ### data not follow assumptions of ANOVA
@@ -252,6 +244,7 @@ harvest$grain_yield_per_plant_log = log(harvest$grain_yield_per_plant + 1)   ## 
 anova_pp_log <-  aov (grain_yield_per_plant_log ~ trt_fac*variety + block, data = harvest); 
 summary(anova_pp_log)
 shapiro.test(anova_pp_log$resid)
+par(mfrow = c(2,2))
 plot(anova_pp_log)
 
 hsd_pp <- HSD.test(anova_pp_log, "trt_fac"); hsd_pp
@@ -262,7 +255,7 @@ mydata = harvest%>%select(trt_fac, variety, grain_yield_per_plant)
 
 D <-  mydata %>%
   group_by( trt_fac) %>%
-  summarize(mean = mean(grain_yield_per_plant), sd = sd(grain_yield_per_plant), se = sd/sqrt(4))
+  summarize(mean = mean(grain_yield_per_plant), sd = sd(grain_yield_per_plant), se = sd/sqrt(8))
 
 b <-  ggplot(D, aes(y = mean, x = trt_fac, fill = trt_fac)) + 
   geom_bar(position = "dodge", stat = "identity") +
