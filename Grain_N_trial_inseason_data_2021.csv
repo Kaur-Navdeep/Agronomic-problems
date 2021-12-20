@@ -1,4 +1,4 @@
-﻿plot_no.,variety,trt,block,germination_percentage,stand_establishment,plant_ht_1,plant_ht_2,plant_ht_3,plant_ht_4,plant_ht_5,days_50_per_flowering,sulfur,nitrogen,phosphorus,potassium,no_of_female_plants,no_of_male_plants,bisexual
+﻿plot_no,variety,trt,block,germination_percentage,stand_establishment,plant_ht_1,plant_ht_2,plant_ht_3,plant_ht_4,plant_ht_5,days_50_per_flowering,sulfur,nitrogen,phosphorus,potassium,no_of_female_plants,no_of_male_plants,bisexual
 101,Bialobrzeskie,56,1,44.71409755,38.61672061,9.53,67.06,86.11,72.64,91.44,29,0.268948289,3.525634766,0.433075194,2.784780439,N/A,N/A,Bisexual
 102,X-59,224,1,45.73032704,39.6329501,7.37,37.59,42.16,36.58,40.89,23,0.208289898,3.089356436,0.38634897,2.984151508,14,9,N/A
 103,Bialobrzeskie,168,1,32.51934367,32.51934367,5.59,54.36,94.49,85.85,216.41,29,0.195061112,3.320512821,0.43307558,2.721382397,N/A,N/A,Bisexual
