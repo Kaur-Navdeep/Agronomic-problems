@@ -23,7 +23,7 @@ x59 <-  filter(mydata, variety == "X-59")
 
 # grouping data ####
 group_by(mydata, mydata$trt)
-grouped_data = group_by(mydata, trt, variety)
+grouped_data <-  group_by(mydata, trt, variety)
 # average of NDVI and NDRE data ####
 ndre_average <-  summarise(grouped_data,  ndre_1_average = mean(ndre_1), ndre_2_average = mean(ndre_2), ndre_3_average = mean(ndre_3), ndre_4_average = mean(ndre_4),ndre_5_average = mean(ndre_5), na.rm = TRUE)
 ndvi_average <-  summarise(grouped_data,  ndvi_1_average = mean(ndvi_1), ndvi_2_average = mean(ndvi_2), ndvi_3_average = mean(ndvi_3), ndvi_4_average = mean(ndvi_4),ndvi_5_average = mean(ndvi_5), na.rm = TRUE)
